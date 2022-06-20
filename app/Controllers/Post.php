@@ -4,6 +4,7 @@ namespace app\Controllers;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Controller;
+use App\Exception\ItemNotFoundException;
 use PostModel;
 
 class Post extends BaseController
@@ -49,10 +50,17 @@ class Post extends BaseController
     public function show($id)
     {
         $model = new PostModel();
-        return $this->getResponse([
-            'message' => 'Post retrieved successfully',
-            'post' => $model->findPost($id)
-        ]);
+        try {
+            return $this->getResponse([
+                'message' => 'Post retrieved successfully',
+                'post' => $model->findPost($id)
+            ]);
+        } catch (ItemNotFoundException $e) {
+            return $this->getResponse([
+                'message' => $e->getMessage(),
+            ],
+                ResponseInterface::HTTP_NOT_FOUND);
+        }
     }
 
     public function update($id)
